@@ -78,24 +78,30 @@ public class BoardController {
 	
 	// post요청으로 /modify가 온다면, 아래 메소드 수행
 	@PostMapping("/modify")
-	public String modify(BoardVO board, RedirectAttributes rttr) {
+	public String modify(BoardVO board, RedirectAttributes rttr, Criteria cri) {
 		log.info("modify: " + board);
 		if(service.modify(board)) {
 			rttr.addFlashAttribute("result","success");
 		}
 		// 수정이 성공하면 success 메시지가 포함되어 이동.
 		// 실패해도 메시지 빼고 이동.
+		rttr.addAttribute("pageNum",cri.getPageNum());
+		rttr.addAttribute("amount",cri.getAmount());
 		
 		return "redirect:/board/list";
 	}
 	
 	@PostMapping("/remove")
-	public String remove(@RequestParam("bno") Long bno, RedirectAttributes rttr) {
+	public String remove(@RequestParam("bno") Long bno, RedirectAttributes rttr, 
+			Criteria cri) {
 		
 		log.info("remove..." + bno);
 		if(service.remove(bno)) {
 			rttr.addFlashAttribute("result", "success");
 		}
+		
+		rttr.addAttribute("pageNum",cri.getPageNum());
+		rttr.addAttribute("amount",cri.getAmount());
 		return "redirect:/board/list";
 	}
 	

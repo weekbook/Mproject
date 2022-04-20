@@ -29,8 +29,9 @@
 					<label>작성자</label> <input class="form-control" name="writer"
 						value='<c:out value="${board.writer }"/>' readonly="readonly">
 				</div>
-				<button data-oper="modify" class="btn btn-warning">
-					<a href="/board/modify?bno=${board.bno }">수정</a>
+				<button data-oper="modify" id="modify_btn" class="btn btn-warning">
+					<a href="/board/modify?bno=${board.bno }pageNum=${cri.pageNum }&amount=${cri.amount }">수정</a>
+					<!-- <a id="modify_btn">수정</a> -->
 				</button>
 				
 				<button data-oper="list" id="list_btn" class="btn btn-info">
@@ -83,6 +84,26 @@ $(document).ready(function(){
 		}
 		formObj.submit();
 	});
+	
+	
+	
+/* 	$("#modify_btn").on("click", function(e){
+		formObj.attr("action", "/board/modify");
+		formObj.submit();
+	}); */
+	
+	$("#modify_btn").on("click", function(e){
+		e.preventDefault();
+		var operation = $(this).data("oper");
+		console.log(operation);
+		if(operation === 'modify'){
+			formObj.attr("action", "/board/modify")
+		}
+		formObj.submit();
+	});
+	
+	
+	
 });
 	
 </script>
