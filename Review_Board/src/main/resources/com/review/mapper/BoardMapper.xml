@@ -12,58 +12,43 @@
  	boardVO 객체 1개당 게시물 1개 저장.
   -->
   
- <mapper namespace="kr.icia.mapper.BoardMapper">
-	<select id="getList" resultType="kr.icia.domain.BoardVO">
+ <mapper namespace="com.review.mapper.BoardMapper">
+	<select id="getList" resultType="com.review.domain.BoardVO">
 		<![CDATA[
 		select * from tbl_board where bno > 0
 		]]>
 			<!-- xml에서 <> 에대한 잘못된 해석을 방지 -->
 	</select>
 	
-	<insert id="insert"><!-- 글쓰기 -->
+	
+	<insert id="insert">
 		insert into tbl_board(bno, title, content, writer)
-		values (seq_board.nextval, #{title},#{content}, #{writer})
+		values (seq_board.nextval, #{title}, #{content}, #{writer})
 	</insert>
 	
-	
-	
-	<!-- 레코드 추가전에 selectKey 관련 작업 처리,
-	추출되는 값은 bno이고, 타입은 long -->
 	<insert id="insertSelectKey">
-		<selectKey keyProperty="bno" order="BEFORE"
-			resultType="long">
-			select seq_board.nextval from dual	
+		<selectKey keyProperty="bno" order="BEFORE" resultType="Long">
+			select seq_board.nextval from dual
 		</selectKey>
+		
 		insert into tbl_board(bno, title, content, writer)
-		values (#{bno},#{title},#{content},#{writer})
+		values(#{bno}, #{title}, #{content}, #{writer})
 	</insert>
 	
-	
-	<!-- 게시물 1개 읽기 -->
-	<select id="read" resultType="kr.icia.domain.BoardVO">
-		select * from tbl_board
-		where bno=#{bno}
+	<select id="read" resultType="com.review.domain.BoardVO">
+		select * from tbl_board where bno=#{bno}
 	</select>
 	
 	<delete id="delete">
 		delete tbl_board where bno=#{bno}
 	</delete>
 	
-	
 	<update id="update">
-		update tbl_board
-		set title=#{title},
+		update tbl_board set
+		title=#{title},
 		content=#{content},
 		writer=#{writer},
 		updateDate=sysdate
 		where bno=#{bno}
 	</update>
-	
-	
-	
-	
-	
-	
-	
-	
 </mapper>

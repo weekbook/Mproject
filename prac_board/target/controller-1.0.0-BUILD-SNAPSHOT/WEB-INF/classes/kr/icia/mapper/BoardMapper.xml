@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <!-- getTime 메소드를 이용하여 오라클에서 시간을 가쟈왔던 것처럼,
+ 	getList 메소드를 이용하여 tbl-board에서 레코드의 값을 가져와 보기.
+ 	순서를 정리하면, 테스트 클래스에서 메소드 호출 >> 매핑된 xml에서 해당 마이바티스 쿼리 구동
+ 	>> 결과를 리턴 받아서, 테스트 창에 출력.
+ 	kr.icia.mapper.BoardMapper : 생성될 인터페이스명,
+ 	kr.icia.domain.BoardVO : 검색결과를 담을 value object.
+ 	boardVO 객체 1개당 게시물 1개 저장.
+  -->
+  
+ <mapper namespace="kr.icia.mapper.BoardMapper">
+	<select id="getList" resultType="kr.icia.domain.BoardVO">
+		<![CDATA[
+		select * from tbl_board where bno > 0
+		]]>
+			<!-- xml에서 <> 에대한 잘못된 해석을 방지 -->
+	</select>
+	
+	
+	<!-- <select id="getListWithPaging" resultType="kr.icia.domain.BoardVO">
+		<![CDATA[
+		select bno, title, content, writer, regdate, updatedate
+		from(
+		select /*+INDEX_DESC(tbl_board pk_board) */
+		rownum rn, bno, title, content, writer, regdate,
+		updatedate from tbl_board
+		where rownum <= #{pageNum} * #{amount}
+		]]>
+		<![CDATA[
+		)
+		where rn > (#{pageNum}-1) * #{amount}		
+		]]>
+			
+	</select> -->
+	<select id="getListWithPaging" resultType="kr.icia.domain.BoardVO">
+	
+	<![CDATA[
+		select bno, title, content, writer, regdate, updatedate 
+		from(
+		select /*+INDEX_DESC(tbl_board pk_board) */ 
+		rownum  rn, bno, title, content, writer, regdate,
+		updatedate from tbl_board 
+		where rownum <= #{pageNum} * #{amount} 
+	]]>	        
+		<if test="keyword != null">
+			and title like '%' || #{keyword} || '%'
+		</if>
+	<![CDATA[
+			    )
+		where rn > (#{pageNum} -1) * #{amount}
+	]]>
+	
+	</select>
+	
+	
+	<insert id="insert"><!-- 글쓰기 -->
+		insert into tbl_board(bno, title, content, writer)
+		values (seq_board.nextval, #{title},#{content}, #{writer})
+	</insert>
+	
+	
+	
+	<!-- 레코드 추가전에 selectKey 관련 작업 처리,
+	추출되는 값은 bno이고, 타입은 long -->
+	<insert id="insertSelectKey">
+		<selectKey keyProperty="bno" order="BEFORE"
+			resultType="long">
+			select seq_board.nextval from dual	
+		</selectKey>
+		insert into tbl_board(bno, title, content, writer)
+		values (#{bno},#{title},#{content},#{writer})
+	</insert>
+	
+	
+	<!-- 게시물 1개 읽기 -->
+	<select id="read" resultType="kr.icia.domain.BoardVO">
+		select * from tbl_board
+		where bno=#{bno}
+	</select>
+	
+	<delete id="delete">
+		delete tbl_board where bno=#{bno}
+	</delete>
+	
+	
+	<update id="update">
+		update tbl_board
+		set title=#{title},
+		content=#{content},
+		writer=#{writer},
+		updateDate=sysdate
+		where bno=#{bno}
+	</update>
+	
+	
+	
+	<!-- 게시물 총 갯수 -->
+	<select id="getTotal" resultType="int">
+    
+        select count(*) from tbl_board
+        
+        <if test="keyword != null">
+            where title like '%'||#{keyword}||'%'
+        </if>
+    
+    </select>
+	
+	
+	
+	
+</mapper>
