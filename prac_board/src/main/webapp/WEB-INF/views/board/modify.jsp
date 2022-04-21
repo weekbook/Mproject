@@ -37,6 +37,7 @@
 					<input type="hidden" name="pageNum" value='<c:out value="${cri.pageNum }"/>'>
 					<input type="hidden" name="amount" value='<c:out value="${cri.amount }"/>'>
 					<input type="hidden" name="keyword" value='<c:out value="${cri.keyword }"/>'>
+					<input type="hidden" name="type" value='<c:out value="${cri.type }"/>'>
 				</form>
 			</div>
 			
@@ -69,12 +70,15 @@
 				var PageNumTag = $("input[name='pageNum']");
 				var amountTag = $("input[name='amount']");
 				var keyword = $("input[name='keyword']");
+				var typetag = $("input[name='type']");
 				
 				formObj.attr("action", "/board/list").attr("method","get");
 				formObj.empty(); // 폼의 내용들 비우기.
 				/* 폼의 내용을 비우고 재설정 하는 이유는, 목록 이동시 게시무르이 제목, 내용, 작성자 등은 전달할 필요X */
-				formObj.append(pageNumTag);
+				formObj.append(PageNumTag);
+				formObj.append(amountTag);
 				formObj.append(keyword);
+				formObj.append(typetag);
 			}
 			formObj.submit();
 			// 위의 조건이 아니라면 수정 처리.

@@ -47,6 +47,7 @@
 					<input type="hidden" name="pageNum" value='<c:out value="${cri.pageNum }"/>'>
 					<input type="hidden" name="amount" value='<c:out value="${cri.amount }"/>'>
 					<input type="hidden" name="keyword" value='<c:out value="${cri.keyword }"/>'>
+					<input type="hidden" name="type" value='<c:out value="${cri.type }"/>'>
 				</form>
 					<!-- 폼을 생성해서 게시물번호를 숨김 값으로 전달.
 					나중에 현재 페이지 번호, 페이지당 게시물수, 검색어, 검색타입 추가 예정
