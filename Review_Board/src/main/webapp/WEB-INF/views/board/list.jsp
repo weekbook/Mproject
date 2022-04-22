@@ -99,10 +99,15 @@
 				// ==는 값만 비교, === 은 값과 형식도 비교
 				return;
 			}
-			if(parseInt(result) > 0) {
-				$(".modal-body").html("게시글 " + parseInt(result) + "번이 등록");
-				// 표시할 내용 만들기
+			if($.isNumeric(result)){
+				if(parseInt(result) > 0) {
+					$(".modal-body").html("게시글 " + parseInt(result) + "번이 등록");
+					// 표시할 내용 만들기
+				}
+			} else{
+				$(".modal-body").html(result);
 			}
+			
 			$("#myModal").modal("show"); //모달창 표시
 		}
 	});

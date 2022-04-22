@@ -2,8 +2,6 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!-- jstl core 쓸때 태그에 c 로 표시. -->
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
-<!-- jstl fmt 쓸때 위와 같음.fmt : formatter 형식 맞춰서 표시 -->
 <%@ include file="../includes/header.jsp"%>
 <div class="row">
 	<div class="col-lg-12">
@@ -16,35 +14,38 @@
 	<div class="col-lg-12">
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<form role="form" action="/board/modify" method="post">
+				<form role="form" id="modifyForm" action="/board/modify" method="post">
+				<input type="hidden" name="bno" value="${board.bno }"/>
+				<input type="hidden" name="pageNum" value="${cri.pageNum }"/>
+				<input type="hidden" name="amount" value="${cri.amount }"/>
 					<div class="form-group">
-						<label>Title</label> <input class="form-control" name="title"
-							value="${board.title }">
+						<label>제목</label> <input class="form-control" name="title"
+							value='<c:out value="${board.title }"/>'>
 					</div>
 					<div class="form-group">
-						<label>Text area</label>
-						<textarea rows="3" class="formcontrol" name="content"><c:out
-								value="${board.content }" />
-</textarea>
+						<label>내용</label>
+						<textarea rows="3" class="form-control" name="content"><c:out value="${board.content }" /></textarea>
 					</div>
 					<div class="form-group">
-						<label>Writer</label> <input class="form-control" name="writer"
-							value='<c:out
-value="${board.writer }"/>'>
+						<label>작성자</label> <input class="form-control" name="writer"
+							value='<c:out value="${board.writer }"/> '>
 					</div>
-					<button type="submit" data-oper='modify' class="btn btn-success">Modify</button>
-					<button type="submit" data-oper='remove' class="btn btn-danger">Remove</button>
-					<button type="submit" data-oper='list' class="btn btn-info">List</button>
+					<button type="submit" data-oper='modify' class="btn btn-success">수정</button>
+					<button type="submit" data-oper='remove' class="btn btn-danger">삭제</button>
+					<button type="submit" data-oper='list' class="btn btn-info">목록</button>
 				</form>
 			</div>
 		</div>
 	</div>
 </div>
+<%@ include file="../includes/footer.jsp"%>
+
 
 <script>
 	$(document).ready(function() {
 		/* 문서가 준비 됐다면, 아래 함수 수행. */
-		var formObj = $("form");/* 문서중 form 요소를 찾아서 변수에 할당. */
+		var formObj = $("#modifyForm");/* 문서중 form 요소를 찾아서 변수에 할당. */
+		
 		$('button').on("click", function(e) {
 			/* 버튼이 클릭된다면 아래 함수 수행, e라는 이벤트 객체를
 			 전달하면서 */
@@ -65,4 +66,3 @@ value="${board.writer }"/>'>
 		});
 	});
 </script>
-<%@ include file="../includes/footer.jsp"%>

@@ -11,6 +11,7 @@
 </h1>
 
 <P>  The time on the server is ${serverTime}. </P>
+<P>  The time on the server is ${myName}. </P>
 <!-- 
 사용자가 웹 브라우저를  이용하여 url에 주소로(get) 서비스 요청,
 pom.xml >> web.xml >> root-context.xml >> servlet-context.xml >> controller 에서

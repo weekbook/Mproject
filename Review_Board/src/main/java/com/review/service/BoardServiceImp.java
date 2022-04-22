@@ -47,7 +47,7 @@ public class BoardServiceImp implements BoardService {
 
 	@Override
 	public List<BoardVO> getList() {
-		log.info("getList.....0");
+		log.info("getList.....");
 		return mapper.getList();
 	}
 

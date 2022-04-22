@@ -36,6 +36,7 @@ public class HomeController {
 		// 날짜 포맷을 문자열 포맷으로 전환
 		
 		model.addAttribute("serverTime", formattedDate );
+		model.addAttribute("myName","이기훈");
 		// 생성된 날짜값을 serverTime 이라는 변수에 담아서 전달.
 		
 		return "home";

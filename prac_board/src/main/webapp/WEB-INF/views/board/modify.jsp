@@ -32,13 +32,13 @@
 					<button type="submit" data-oper='remove' class="btn btn-danger">삭제</button>
 					<button type="submit" data-oper='list' id="list_btn" class="btn btn-info">목록</button>
 				</form>
-				<form id="infoForm" action="/board/modify" method="get">
+				<%-- <form id="infoForm" action="/board/modify" method="get">
 					<input type="hidden" id="bno" name="bno" value='<c:out value="${board.bno }"/>'>
 					<input type="hidden" name="pageNum" value='<c:out value="${cri.pageNum }"/>'>
 					<input type="hidden" name="amount" value='<c:out value="${cri.amount }"/>'>
 					<input type="hidden" name="keyword" value='<c:out value="${cri.keyword }"/>'>
 					<input type="hidden" name="type" value='<c:out value="${cri.type }"/>'>
-				</form>
+				</form> --%>
 			</div>
 			
 		</div>
@@ -48,7 +48,7 @@
 <script>
 	$(document).ready(function(){
 		var formObj = $("#modifyForm"); // 문서중 form 요소를 찾아서 변수에 할당
-		var iform = $("#infoForm");
+		/* var iform = $("#infoForm"); */
 		
 		
 		$('button').on("click", function(e) {
@@ -74,7 +74,7 @@
 				
 				formObj.attr("action", "/board/list").attr("method","get");
 				formObj.empty(); // 폼의 내용들 비우기.
-				/* 폼의 내용을 비우고 재설정 하는 이유는, 목록 이동시 게시무르이 제목, 내용, 작성자 등은 전달할 필요X */
+				/* 폼의 내용을 비우고 재설정 하는 이유는, 목록 이동시 게시물의 제목, 내용, 작성자 등은 전달할 필요X */
 				formObj.append(PageNumTag);
 				formObj.append(amountTag);
 				formObj.append(keyword);
