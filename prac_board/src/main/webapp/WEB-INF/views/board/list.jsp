@@ -252,5 +252,3 @@
 
 
 <%@ include file="../includes/footer.jsp"%>
-
-lo
