@@ -62,4 +62,5 @@ public class BoardServiceImp implements BoardService {
 	public int getTotal(Criteria cri) {
 		return mapper.getTotal(cri);
 	}
+
 }

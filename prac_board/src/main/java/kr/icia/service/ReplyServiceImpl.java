@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.icia.domain.Criteria;
+import kr.icia.domain.ReplyPageDTO;
 import kr.icia.domain.ReplyVO;
 import kr.icia.mapper.ReplyMapper;
 import lombok.Setter;
@@ -42,13 +43,20 @@ public class ReplyServiceImpl implements ReplyService {
 		return mapper.update(reply);
 	}
 
+
 	@Override
 	public List<ReplyVO> getList(Criteria cri, Long bno) {
-		log.info("get Reply lisy " + bno);
+		log.info("get Reply list " + bno);
 		return mapper.getListWithPaging(cri, bno);
 	}
 
-	
+	@Override
+	public ReplyPageDTO getListPage(Criteria cri, Long bno) {
+		return new ReplyPageDTO(mapper.getCountByBno(bno)
+				, mapper.getListWithPaging(cri, bno));
+		// 각각의 매퍼를 이용하여 덧글의 갯수와 덧글의 목록 추출.
+		// ReplyPageDTO(게시물별 덧글 총갯수, 게시물별 10개씩 덧글 목록
+	}
 
 	
 

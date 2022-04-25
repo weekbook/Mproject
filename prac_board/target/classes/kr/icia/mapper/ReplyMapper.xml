@@ -21,16 +21,32 @@
   			delete from tbl_reply where rno=#{rno}
   		</delete>
   		
+  		<!-- 작성자 이름도 업데이트 하고 싶다면 replyer=#{replyer} 만 추가하면됨 -->
   		<update id="update">
   			update tbl_reply set reply=#{reply},
   			updatedate=sysdate
   			where rno = #{rno}
   		</update>
   		
+  		<!-- 검색이 빠진 페이징 처리와 같다. -->
   		<select id="getListWithPaging" resultType="kr.icia.domain.ReplyVO">
   			select rno, bno, reply, replyer, replydate, updatedate
-  			from tbl_reply where bno=#{bno}
-  			order by rno asc
+  			from 
+  			<![CDATA[
+  			(select /*+INDEX(tbl_reply idx_reply) */
+  			rownum rn, rno, bno, reply, replyer, replyDate, updatedate
+  			from tbl_reply
+  			where bno=#{bno}
+  			and rno > 0
+  			and rownum <= #{cri.pageNum} * #{cri.amount}
+  			order by rno
+  			) where rn > (#{cri.pageNum}-1) * #{cri.amount}
+  			]]>
+  		</select>
+  		
+  		<!-- 게시물별 댓글 총갯수 리턴 -->
+  		<select id="getCountByBno" resultType="int">
+  			select count(rno) from tbl_reply where bno=#{bno}
   		</select>
   
   </mapper>

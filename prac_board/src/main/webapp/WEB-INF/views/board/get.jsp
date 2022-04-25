@@ -64,7 +64,7 @@
 </div>
 
 <!-- 덧글 목록 시작 -->
-<br />
+<br />	
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel panel-defualt">
@@ -161,6 +161,10 @@
 			}
 			formObj.submit();
 		});
+		 
+		 
+		var modalModBtn=$("#modalModBtn");
+		var modalRemoveBtn = $("#modalRemoveBtn");
 
 		console.log(replyService);
 		var bnoValue = '<c:out value="${board.bno}"/>';
@@ -218,22 +222,124 @@
 				modal.find("input").val("");
 				// 모달창 초기화
 				modal.modal("hide"); // 모달창 숨기기
+				
+				// 덧글 작성 즉시 목록 갱신용 함수 호출.
+				showList(-1);
+				// -1 이나 99나 현재는 영향이 없지만 차후 덧글의 페이징 처리에서 -1 사용 예정
+				
+				
 			});
 		}); // 덧글 쓰기버튼처리 끝.
 
 		// 덧글 목록 보이기.
-		replyService.getList({
+		/* replyService.getList({
 			bno : bnoValue,
 			pgee : 1
 		}, function(list) {
 			for (var i = 0, len = list.length || 0; i < len; i++) {
 				console.log(list[i]);
 			}
-		}); //덧글 목록 표시 끝
+		}); */
+		
+		var replyUL = $(".chat");
+		
+		function showList(page){
+			replyService.getList(
+					{
+						bno : bnoValue,
+						page : page || 1
+					},
+					// 익명함수 : 이름이 없으며 즉시 실행
+					function(replyTotalCnt, list) {
+						console.log("replyTotalCnt : " + replyTotalCnt);
+						
+						if(page == -1){
+							// 페이지 번호가 음수 값 이라면,
+							
+							PageNum = Math.ceil(replyTotalCnt / 10.0);
+							// 덧글의 마지막 페이지 구하기.
+							
+							showList(pageNum);
+							// 덧글 목록 새로고침(갱신)
+							
+							return;
+						}
+						
+						var str = "";
+						
+						if (list ==null || list.length == 0 ){
+							replyUL.html("");
+							return;
+						} // 목록이 없을때 처리 끝.
+						
+						for (var i = 0, len = list.length || 0; i<len; i++){
+							str += "<li class='left ";
+							str += "clearfix' data-rno='";
+							str += list[i].rno+"'>";
+							str += "<div><div class='header' ";
+							str += "><strong class='";
+							str += "primart-font'>";
+							str += list[i].replyer+ "</strong>";
+							str += "<small class='float-sm-right '>";
+							str += replyService.displayTime(list[i].replyDate)
+							+ "</small></div>";
+							str += "<p>" + list[i].reply;
+							str += "</p></div></li>";
+						}
+						replyUL.html(str); 
+					}); // end
+		} // end_showlist
+		showList(1);
+		// 덧글 목록 표시 끝 
 
+		// 댓글 정보 확인
+        $(".chat").on("click", "li", function(e){
+            // 클래스 char 을 클릭하는데, 하위 요소가 li라면,
+            var rno = $(this).data("rno");
+            // 덧글에 포함된 값들 중에서 rno를 추출하여 변수 할당.
+            console.log(rno);
+            
+            replyService.get(rno,function(reply){
+                modalInputReply.val(reply.reply);
+                modalInputReplyer.val(reply.replyer);
+                modalInputReplyDate.val(replyService.displayTime(reply.replyDate))
+                        .attr("readonly", "readonly");
+                // 댓글 목록의 값들을 모달창에 할당.
+                modal.data("rno", reply.rno);
+                // 표시되는 모달창에 rno 라는 이름으로 data-rno를 저장.
+                modal.find("button[id != 'modalCloseBtn']").hide();
+                modalModBtn.show();
+                modalRemoveBtn.show();
+                // 버튼 보이기 설정.
+                $("#myModal").modal("show");
+            }); // 끝_덧글 읽기.
+        });
+		
+		// 덧글 수정 처리 시작.
+		modalModBtn.on("click", function(e) {
+			var reply = {
+					rno : modal.data("rno"),
+					/* replyer : modalInputReplyer.val(), */
+					reply : modalInputReply.val()
+			};
+			replyService.update(reply, function(result){
+				alert(result);
+				modal.modal("hide");
+				showList(-1);
+			});
+		}); // 끝 덧글 수정.
+		
+		// 덧글 삭제 처리.
+		modalRemoveBtn.on("click", function(e){
+			var rno = modal.data("rno");
+			replyService.remove(rno, function(result){
+				alert(result);
+				modal.modal("hide");
+				showList(-1);
+			});
+		});
+		
 	});
 </script>
-
-
 
 <%@ include file="../includes/footer.jsp"%>

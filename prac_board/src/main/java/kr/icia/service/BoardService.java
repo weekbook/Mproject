@@ -20,4 +20,7 @@ public interface BoardService {
 	public List<BoardVO> getList(Criteria cri); // 페이징 목록
 
 	public int getTotal(Criteria cri);
+	
+	
+	
 }
