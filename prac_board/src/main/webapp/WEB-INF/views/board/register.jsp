@@ -51,63 +51,133 @@
 <!-- 첨부파일 처리 끝 -->
 
 <script>
-$(document).ready(function(){
-   var formObj=$("form[role='form']");// 글쓰기 폼을 스크립트 객체로 할당.
-   $("button[type='submit']").on("click",function(e){
-      e.preventDefault();
-      console.log("submit clicked");
-   });
-   
-   var regex=new RegExp("(.*?)\.(exe|sh|zip|alz)$");
-   // 정규표현식. 일부 파일의 업로드 제한. 필터, 
-   // https://regexper.com/
-   
-   var maxSize = 5242880; // 5MB
-   
-   function checkExtension(fileName, fileSize){
-      if(fileSize >=maxSize){
-         alert("파일 크기 초과");
-         return false;
-      }
-      
-      if(regex.test(fileName)){
-         alert("해당 종류의 파일은 업로드 불가.");
-         return false;
-      }
-      return true;
-   }
-   
-   $("input[type='file']").change(function(e){
-      // 첨부파일 정보를 변경 한다면,
-      var formData = new FormData();// 스크립트의 폼 객체.
-      // 폼에 담고 있지만, 기존과 동일한 항목과 값의 형태로 처리.
-      var inputFile=$("input[name='uploadFile']");// 화면의 파일 요소를 변수에 할당.
-      var files=inputFile[0].files;
-      // .files 를 이용하면 배열로 파일 값들을 리턴.
-      for(var i=0;i<files.length;i++){
-         if(!checkExtension(files[i].name, files[i].size)){
-            return false;
-         }
-         formData.append("uploadFile",files[i]);
-         // 확장자와 크기가 지정한 규격에 맞다면, 폼에 해당 파일 정보를 추가.
-      }
-      
-      $.ajax({
-         url:'/uploadAjaxAction',
-         processData:false,
-         contentType:false,
-         data:formData, // 실제 2진 데이터 전송이 아니고, 파일관련 정보만 전송.
-         type:'post',// 첨부파일 처리는 get 방식은 불가.
-         dataType:'json',
-         success:function(result){
-            console.log(result);
-            
-         }
-      });
-   });
+   $(document)
+         .ready(
+               function() {
+                  var formObj = $("form[role='form']");// 글쓰기 폼을 스크립트 객체로 할당.
+                  $("button[type='submit']").on("click", function(e) {
+                     e.preventDefault();
+                     console.log("submit clicked");
+                  });
 
+                  var regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$");
+                  // 정규표현식. 일부 파일의 업로드 제한. 필터, 
+                  // https://regexper.com/
 
-});
+                  var maxSize = 5242880; // 5MB
+
+                  function checkExtension(fileName, fileSize) {
+                     if (fileSize >= maxSize) {
+                        alert("파일 크기 초과");
+                        return false;
+                     }
+
+                     if (regex.test(fileName)) {
+                        alert("해당 종류의 파일은 업로드 불가.");
+                        return false;
+                     }
+                     return true;
+                  }
+
+                  $("input[type='file']")
+                        .change(
+                              function(e) {
+                                 // 첨부파일 정보를 변경 한다면,
+                                 var formData = new FormData();// 스크립트의 폼 객체.
+                                 // 폼에 담고 있지만, 기존과 동일한 항목과 값의 형태로 처리.
+                                 var inputFile = $("input[name='uploadFile']");// 화면의 파일 요소를 변수에 할당.
+                                 var files = inputFile[0].files;
+                                 // .files 를 이용하면 배열로 파일 값들을 리턴.
+                                 for (var i = 0; i < files.length; i++) {
+                                    if (!checkExtension(
+                                          files[i].name,
+                                          files[i].size)) {
+                                       return false;
+                                    }
+                                    formData.append("uploadFile",
+                                          files[i]);
+                                    // 확장자와 크기가 지정한 규격에 맞다면, 폼에 해당 파일 정보를 추가.
+                                 }
+
+                                 $.ajax({
+                                    url : '/uploadAjaxAction',
+                                    processData : false,
+                                    contentType : false,
+                                    data : formData, // 실제 2진 데이터 전송이 아니고, 파일관련 정보만 전송.
+                                    type : 'post',// 첨부파일 처리는 get 방식은 불가.
+                                    dataType : 'json',
+                                    success : function(result) {
+                                       console.log(result);
+                                       showUploadResult(result);
+                                    }
+                                 });
+                              });// end_upload_change
+
+                  // 첨부파일 목록 시작.
+                  function showUploadResult(uploadResultArr) {
+                     if (!uploadResultArr || uploadResultArr.length == 0) {
+                        // json 처리 결과가 없다면 함수 종료.
+                        return;
+                     }
+                     var uploadUL = $(".uploadResult ul");
+                     var str = "";
+
+                     // each 구문은 전달된 배열의 길이 만큼, 
+                     // each 이후의 함수를 반복 처리.
+                     // https://api.jquery.com/jQuery.each/#jQuery-each-array-callback
+                     $(uploadResultArr).each(function(i, obj) {
+                        var fileCallPath = encodeURIComponent(obj.uploadPath
+                              + "/" + obj.uuid + "_" + obj.fileName);
+                        // encodeURIComponent : 
+                        // uri 로 전달되는 특수문자의 치환.
+                        // & ?
+                        var fileLink = fileCallPath.replace(new RegExp(/\\/g), "/");
+                        // 전달되는 값들 중에서 역슬러시를 찾아서 슬러시로 변경.
+
+                        str += "<li data-path='";
+                        str += obj.uploadPath+"' data-uuid='";
+                        str += obj.uuid+"' data-filename='";
+                        str += obj.fileName+"' data-type='";
+                        str += obj.image+"'><div>";
+                        str += "<img src='/resources/img/attach.png' width='20' height='20'>";
+                        str += "<span>" + obj.fileName + "</span> ";
+                        str += "<b data-file='"+fileCallPath;
+                        str += "' data-type='file'>[x]</b>";
+                        str += "</div></li>";
+                                 });
+                     uploadUL.append(str);
+                  }// end_showUploadResult
+                  // 첨부파일 목록 끝.
+                  
+                  // 첨부파일 목록에서 삭제 처리 이벤트 시작
+                  $(".uploadResult").on("click","b",function(e){
+                	  console.log("delete file");
+                	  
+                	  var targetFile = $(this).data("file");
+                	  var type = $(this).data("type");
+                	  var targetLi = $(this).closest("li");
+                	  
+                	  $.ajax({
+                		  url : '/deleteFile',
+                		  data : {
+                			  fileName : targetFile,
+                			  type :type
+                		  },
+                		  dataType : 'text',
+                		  type : 'POST',
+                		  success : function(result){
+                			  alert(result);
+                			  targetLi.remove();
+                		  }
+                	  })
+                  });
+                  // 첨부파일 목록에서 삭제 처리 이벤트 끝.
+
+               
+               
+               });
+   
+  
 </script>
 
 <%@ include file="../includes/footer.jsp"%>
