@@ -222,7 +222,7 @@
 				modal.find("input").val("");
 				// 모달창 초기화
 				modal.modal("hide"); // 모달창 숨기기
-				
+				modalInputReplyDate.closest("div").show();
 				// 덧글 작성 즉시 목록 갱신용 함수 호출.
 				showList(-1);
 				// -1 이나 99나 현재는 영향이 없지만 차후 덧글의 페이징 처리에서 -1 사용 예정
@@ -287,9 +287,65 @@
 							str += "</p></div></li>";
 						}
 						replyUL.html(str); 
+						showReplyPage(replyTotalCnt); // 덧글 목록 표시후 쪽번호 표시
 					}); // end
 		} // end_showlist
 		showList(1);
+		
+		// 기존 게시판의 쪽번호는 디비에서 읽어서 자바로 설정값을 만들고, 표시 했다면,
+		// 덧글의 쪽번호는 디비에서 읽어서 스크립트로 표시한다는 차이.
+		/* 덧글 페이징 시작 */
+		var pageNum = 1;
+		var replyPageFooter = $(".panel-footer");
+
+        function showReplyPage(replyCnt){
+            var endNum = Math.ceil(pageNum / 10.0) * 10;
+            // pageNum : 1이라고 가정하면,
+            // Math.ceil(1/10.0) 처리하고 * 10, 즉 endNum : 10
+            var startNum = endNum - 9; // 나올지도..
+            var prev = startNum != 1; // false = (1 != 1)
+            var next = false;
+            // replyCnt : 384, endNum : 39
+            if(endNum * 10 >= replyCnt) { // 100 >= 384
+                endNum = Math.ceil(replyCnt / 10.0);
+            }
+            if(endNum * 10 < replyCnt){
+                next = true;
+            }
+            var str = "<ul class='pagination";
+            str+=" justify-content-center'>";
+            if(prev){
+                str += "<li class='page-item><a ";
+                str += "class='page-link' href='";
+                str += (startNum - 1);
+                str += "'>이전</a></li>";
+            }
+            for(var i = startNum; i <= endNum; i++){
+                var active = pageNum == i ? "active" : "";
+                str += "<li class='page-item " + active
+                +"'><a class='page-link' ";
+                str+="href='" + i + "'>"
+                + i + "</a></li>";
+            }
+            if(next){
+                str += "<li class='page-item'>";
+                str += "<a class='page=link' href='";
+                str += (endNum + 1) + "'>다음</a></li>";
+            }
+            str += "</ul>";
+            console.log(str);
+            replyPageFooter.html(str);
+        }
+        // 덧글 페이징 끝
+        
+        
+        // 덧글 페이징 클릭시 처리.
+        replyPageFooter.on("click", "li a", function(e){
+        	e.preventDefault();
+        	var targetPageNum = $(this).attr("href");
+        	pageNum = targetPageNum;
+        	showList(pageNum);
+        });
 		// 덧글 목록 표시 끝 
 
 		// 댓글 정보 확인

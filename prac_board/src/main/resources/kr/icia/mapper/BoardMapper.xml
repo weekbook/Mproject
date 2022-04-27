@@ -50,11 +50,11 @@
 		resultType="kr.icia.domain.BoardVO">
 	
 	<![CDATA[
-		select bno, title, content, writer, regdate, updatedate 
-		from(
+		select bno, title, content, writer, regdate, 
+		updatedate, replycnt from(
 		select /*+INDEX_DESC(tbl_board pk_board) */ 
 		rownum  rn, bno, title, content, writer, regdate,
-		updatedate from tbl_board 
+		updatedate, replycnt from tbl_board 
 		where rownum <= #{pageNum} * #{amount} 
 	]]>
 		<if test="keyword != null">
@@ -123,8 +123,11 @@
 		</if>
 
 	</select>
-
-
+	
+	<update id="updateReplyCnt">
+		update tbl_board set replycnt=replycnt + #{amount}
+		where bno=#{bno}
+	</update>
 
 
 </mapper>

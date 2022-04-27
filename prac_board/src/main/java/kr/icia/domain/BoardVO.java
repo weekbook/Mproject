@@ -1,6 +1,7 @@
 package kr.icia.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
 
@@ -12,4 +13,10 @@ public class BoardVO {
 	private String writer;
 	private Date regdate;
 	private Date updateDate;
+	
+	private int replyCnt;
+	
+	private List<BoardAttachVO> attachList; // 첨푸 파일 목록(부모 자식 관계)
+
+
 }

@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.icia.domain.Criteria;
 import kr.icia.domain.ReplyPageDTO;
 import kr.icia.domain.ReplyVO;
+import kr.icia.mapper.BoardMapper;
 import kr.icia.mapper.ReplyMapper;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
@@ -19,9 +21,18 @@ public class ReplyServiceImpl implements ReplyService {
 	@Setter(onMethod_ = @Autowired)
 	private ReplyMapper mapper;
 	
+	@Setter(onMethod_ =@Autowired)
+	private BoardMapper boardMapper;
+	// 게시물 테이블과 덧글 테이블은 동시에 동작하거나 취소 되어야 함.
+	// @Transactional 이용
+	
+	@Transactional
 	@Override
 	public int register(ReplyVO vo) {
 		log.info("register......" + vo);
+		boardMapper.updateReplyCnt(vo.getBno(), 1);
+		// 덧글이 등록 된다면, 게시물 테이블의 덧글 총갯수 1증가.
+		
 		return mapper.insert(vo);
 	}
 	
@@ -31,9 +42,13 @@ public class ReplyServiceImpl implements ReplyService {
 		return mapper.read(rno);
 	}
 	
+	@Transactional
 	@Override
 	public int remove(Long rno) {
 		log.info("remove....." + rno );
+		ReplyVO vo = mapper.read(rno);
+		boardMapper.updateReplyCnt(vo.getBno(), -1);
+		
 		return mapper.delete(rno);
 	}
 
