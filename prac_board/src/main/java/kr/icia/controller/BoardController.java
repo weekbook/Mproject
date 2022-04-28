@@ -1,5 +1,13 @@
 package kr.icia.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,8 +15,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import kr.icia.domain.BoardAttachVO;
 import kr.icia.domain.BoardVO;
 import kr.icia.domain.Criteria;
 import kr.icia.domain.PageDTO;
@@ -58,6 +68,16 @@ public class BoardController {
 		// 매개변수 인자들은 스프링이 자동으로 생성 할당 함.
 		log.info("register : " + board);
 		service.register(board);
+		// Controller에서는 첨부파일을 처리하지 않고,
+		// 서비스 계층에서 처리할 예정 이다.
+		// 그러므로, 첨부파일 정보에 bno가 널인 것은 상관 없음.
+		
+		if(board.getAttachList() != null) {
+			// 첨부파일이 있다면,
+			board.getAttachList().forEach(attach -> log.info(attach));
+			// 첨부파일의 각 요소를 로그로 출력.
+		}
+		
 		rttr.addFlashAttribute("result",board.getBno());
 		// 리다이렉트 시키면서 1회용 값을 전달.
 		
@@ -98,7 +118,11 @@ public class BoardController {
 			Criteria cri) {
 		
 		log.info("remove..." + bno);
+		List<BoardAttachVO> attachList = service.getAttachList(bno);
+		
 		if(service.remove(bno)) {
+			
+			deleteFiles(attachList); // 서버디스크의 파일 정보 삭제.
 			rttr.addFlashAttribute("result", "success");
 		}
 		
@@ -109,6 +133,40 @@ public class BoardController {
 		
 		return "redirect:/board/list";
 	}
+	
+	// 글 내용을 읽으면서 ajax 호출로 정부파일 목록 표서드.
+	@GetMapping(value = "/getAttachList", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ResponseEntity<List<BoardAttachVO>> getAttachList(Long bno) {
+		log.info("getAttachList: " + bno);
+		
+		return new ResponseEntity<>(service.getAttachList(bno), HttpStatus.OK);
+	}
+	
+	
+	
+	// 첨부파일 삭제 처리 메소드.
+	private void deleteFiles(List<BoardAttachVO> attachList) {
+		if (attachList == null || attachList.size() == 0) {
+			return;
+		}
+		log.info("delete attach file....");
+		log.info(attachList);
+		
+		attachList.forEach(attach -> {
+			try {
+				Path file = Paths.get(
+						"c:\\upload\\"+attach.getUploadPath()+"\\"
+						+ attach.getUuid() + "_" + attach.getFileName());
+				Files.deleteIfExists(file);
+				// 해당 파일이 존재한다면 삭제 처리.
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+	
+	
 	
 	
 	

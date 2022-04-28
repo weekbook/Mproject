@@ -41,7 +41,12 @@
 						<tr>
 							<td><c:out value="${board.bno }"></c:out></td>
 							<td><a href="${board.bno }" class="move"><c:out
-										value="${board.title }"></c:out></a></td>
+										value="${board.title }"/>
+										<!-- JSTL문법 != 을 ne로 표시한것  / == eq -->
+										<c:if test="${board.replyCnt ne 0 }">
+										<span style="color:red;">[<c:out value="${board.replyCnt}"/>]</span>
+										</c:if>
+										</a></td>
 							<td><c:out value="${board.writer }"></c:out></td>
 							<td><fmt:formatDate pattern="yyyy-MM-dd"
 									value="${board.regdate }" /></td>
@@ -64,7 +69,7 @@
 		                <option value="TCW" <c:out value="${pageMaker.cri.type eq 'TCW'?'selected':'' }"/>>제목 + 내용 + 작성자</option>
 	           		 </select>
 					<input type="text" name="keyword" value="${pageMaker.cri.keyword }">
-					<button>Search</button>
+					<button class="btn btn-warning" id="searchBtn">Search</button>
 				</div>
 			</div>		
 			
