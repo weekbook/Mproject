@@ -25,4 +25,6 @@ public interface ReplyMapper {
 	// °Ô½Ã¹°º° ´ñ±Û ÃÑ°¹¼ö ÆÄ¾Ç.
 	public int getCountByBno(Long bno);
 	
+	public int deleteAll(Long bno);
+	
 }

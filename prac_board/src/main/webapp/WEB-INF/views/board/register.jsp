@@ -58,6 +58,37 @@
                   $("button[type='submit']").on("click", function(e) {
                      e.preventDefault();
                      console.log("submit clicked");
+                     
+                     
+                     // 첨부파일 정보를 폼에 담아서 컨트롤러로 전송 처리 시작.
+                     var str ="";
+                     $(".uploadResult ul li").each(function(i, obj){
+                    	 // i는 인덱스, obj는 li객체.
+                    	 var jobj=$(obj);
+                    	 console.dir(jobj); // console.dir() JavaScript 객체의 모든 속성을 보는 방법.
+                    	 console.log("--------------------------");
+                    	 console.log(jobj.data("filename"));
+                    	 
+                    	 str+="<input type='hidden' name='attachList[";
+                    	 str+=i+"].fileName' value='"+jobj.data("filename");
+                    	 str+="'>";
+                    	 
+                    	 str+="<input type='hidden' name='attachList[";
+                    	 str+=i+"].uuid' value='"+jobj.data("uuid");
+                    	 str+="'>";
+                    	 
+                    	 str+="<input type='hidden' name='attachList[";
+                    	 str+=i+"].uploadPath' value='"+jobj.data("path");
+                    	 str+="'>";
+                    	 
+                    	 str+="<input type='hidden' name='attachList[";
+                    	 str+=i+"].fileType' value='"+jobj.data("type");
+                    	 str+="'>";
+                     });
+                     formObj.append(str).submit();
+                     // 첨부파일의 정보들을 li의 data 값으로 가지고있다가
+                     // hidden 으로 폼에 포함.
+                     
                   });
 
                   var regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$");

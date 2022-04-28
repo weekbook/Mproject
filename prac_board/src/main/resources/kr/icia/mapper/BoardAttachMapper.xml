@@ -6,8 +6,8 @@
 
 <mapper namespace="kr.icia.mapper.BoardAttachMapper">
 	 	<insert id="insert">
-	 		insert into tbl_attach (uuid, uploadpath. filename,
-	 		filetype, bno) values (#{uuid},#{uploadPath},#{filename}
+	 		insert into tbl_attach (uuid, uploadpath, filename,
+	 		filetype, bno) values (#{uuid},#{uploadPath},#{fileName}
 	 		,#{fileType},#{bno})
 	 	</insert>
 	 	
@@ -19,5 +19,9 @@
 	 		select * from tbl_attach where
 	 		bno=#{bno}	
 	 	</select>
+	 	
+	 	<delete id="deleteAll">
+	 		delete tbl_attach where bno=#{bno}
+	 	</delete>
 	 	
 </mapper>
