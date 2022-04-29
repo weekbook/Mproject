@@ -16,7 +16,7 @@ public class BoardVO {
 	
 	private int replyCnt;
 	
-	private List<BoardAttachVO> attachList; // 첨푸 파일 목록(부모 자식 관계)
+	private List<BoardAttachVO> attachList; // 첨부 파일 목록(부모 자식 관계)
 
 
 }

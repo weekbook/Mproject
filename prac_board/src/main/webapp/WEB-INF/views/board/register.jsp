@@ -2,6 +2,8 @@
    pageEncoding="UTF-8"%>
 <%@ include file="../includes/header.jsp"%>
 
+
+
 <div class="row">
    <div class="col-lg-12">
       <h1 class="page-header">글쓰기</h1>
@@ -12,6 +14,9 @@
       <div class="panel panel-default">
          <div class="panel-body">
             <form role="form" action="/board/register" method="post">
+            <input type="hidden" name="${_csrf.parameterName }"
+            	value="${_csrf.token }"/>
+            
                <div class="form-group">
                   <label>제목</label> <input class="form-control" name='title'>
                </div>
