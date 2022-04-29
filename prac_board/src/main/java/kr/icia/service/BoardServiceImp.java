@@ -55,12 +55,36 @@ public class BoardServiceImp implements BoardService {
 		return mapper.read(bno);
 	}
 
-	@Override
-	public boolean modify(BoardVO board) {
-		log.info("modify......" + board);
-		return mapper.update(board)==1;
-	}
+	   @Transactional
+	   @Override
+	   public boolean modify(BoardVO board) {
+	      log.info("modify......" + board);
+	      boolean modifyResult = false; // 게시물 수정 성공 여부.
+	      modifyResult = mapper.update(board) == 1;
+	      int attachList = 0;// 첨부파일 갯수.
+	      if (board.getAttachList() != null) {
+	         attachList = board.getAttachList().size();
+	      }
+	      
+	      long bno = board.getBno();
+	      attachMapper.deleteAll(bno);
+	      // 파일은 삭제 했어도, 디비 정보가 남아 있는 부분을 해소.
+	      
+	      if (modifyResult && attachList > 0) {
+	         // 등록하려는 첨부파일 목록(11,22)
+	         List<BoardAttachVO> inputList = board.getAttachList();
+	         // 디비에 등록되어 있는 첨부파일 목록(22,33)
+	         // List<BoardAttachVO> dbList = attachMapper.findByBno(board.getBno());
+	         
+	         for (BoardAttachVO bav : inputList) {
+	            bav.setBno(bno);
+	            attachMapper.insert(bav);
+	         }
+	      }
+	      return modifyResult;
+	   }
 
+	@Transactional
 	@Override
 	public boolean remove(Long bno) {
 		log.info("remove......" + bno);
@@ -69,7 +93,7 @@ public class BoardServiceImp implements BoardService {
 		
 		return (mapper.delete(bno)) ==1 ;
 	}
-
+	
 	@Override
 	public List<BoardVO> getList() {
 		log.info("getList......");
@@ -93,6 +117,8 @@ public class BoardServiceImp implements BoardService {
 	public List<BoardAttachVO> getAttachList(Long bno) {
 		log.info("get Attach list by bno : " + bno);
 		return attachMapper.findByBno(bno);
+		// 게시물 번호를 전달하고,
+		// 게시물 번호와 일치하는 첨부파일을 모두 리턴.
 	}
 
 }

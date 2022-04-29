@@ -119,7 +119,6 @@ public class UploadController {
 	
 	// 파일 다운로드에 대한 메소드 처리 시작.
 	// 처음에 작성하지만, 차후에는 복붙 / 일종의 상용구 형태.
-	
 	@GetMapping(value = "/download",
 			produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	@ResponseBody
@@ -162,8 +161,6 @@ public class UploadController {
 		}
 		return new ResponseEntity<Resource>(resource, headers, HttpStatus.OK);
 	}
-	
-	
 	
 	
 }
