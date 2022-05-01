@@ -1,7 +1,5 @@
 package kr.icia.controller;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.icia.domain.Criteria;
+import kr.icia.domain.ReplyPageDTO;
 import kr.icia.domain.ReplyVO;
 import kr.icia.service.ReplyService;
 import lombok.AllArgsConstructor;
@@ -51,16 +50,17 @@ public class ReplyController {
 	}
 
 	// bno는 게시물 번호, page는 덧글의 페이지.
+	// 댓글의 경우, 게시물 별로 목록이 다르다.
 	@GetMapping(value = "/pages/{bno}/{page}", produces = {
 			MediaType.APPLICATION_JSON_VALUE })
-	public ResponseEntity<List<ReplyVO>> getList(@PathVariable("page") int page
+	public ResponseEntity<ReplyPageDTO> getList(@PathVariable("page") int page
 			, @PathVariable("bno") Long bno) {
 		// @PathVariable : url로 넘겨받은 값 이용
 		log.info("getList.....");
 		Criteria cri = new Criteria(page , 10);
 		log.info(cri);
 
-		return new ResponseEntity<>(service.getList(cri, bno), HttpStatus.OK);
+		return new ResponseEntity<>(service.getListPage(cri, bno), HttpStatus.OK);
 		// T<List<ReplyVO>> t = new T<>();
 		// 댓글 목록을 출ㄹ력하고, 정상 처리 상태를 리턴
 	}

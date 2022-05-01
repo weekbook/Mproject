@@ -21,4 +21,10 @@ public interface ReplyMapper {
 			@Param("bno") Long bno);
 	// 페이지 정보와 게시물 번호를 전달.
 	
+	
+	// 게시물별 댓글 총갯수 파악.
+	public int getCountByBno(Long bno);
+	
+	public int deleteAll(Long bno);
+	
 }

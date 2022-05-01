@@ -212,14 +212,55 @@ value="${board.writer }"/>' readonly="readonly">
 		});
 		
 		// 덧글 목록 보이기.
-		replyService.getList({
+		/* replyService.getList({
 			bno : bnoValue,
 			page : 1
 		}, function(list){
 			for(var i=0, len = list.length || 0; i<len; i++){
 				console.log(list[i]);
 			}
-		});
+		}); */
+		
+		var replyUL = $(".chat");
+		
+		function showList(page){
+			replyService.getList(
+					{
+						bno : bnoValue,
+						page : page || 1
+					},
+					// 익명함수 : 이름이 없으며 즉시 실행
+					function(list) {
+						
+						var str = "";
+						
+						if (list ==null || list.length == 0 ){
+							replyUL.html("");
+							return;
+						} // 목록이 없을때 처리 끝.
+						
+						for (var i = 0, len = list.length || 0; i<len; i++){
+							str += "<li class='left ";
+							str += "clearfix' data-rno='";
+							str += list[i].rno+"'>";
+							str += "<div><div class='header' ";
+							str += "><strong class='";
+							str += "primart-font'>";
+							str += list[i].replyer+ "</strong>";
+							str += "<small class='float-sm-right '>";
+							str += list[i].replyDate
+							+ "</small></div>";
+							str += "<p>" + list[i].reply;
+							str += "</p></div></li>";
+						}
+						replyUL.html(str); 
+					}); // end
+		} // end_showlist
+		showList(1);
+		
+		
+		
+		
 		
 	}); // end_document_ready
 		
