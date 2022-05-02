@@ -21,7 +21,7 @@
 					<input type="password" name="password" placeholder="password" class="form-control">
 				</div>
 				<div class="form-group">
-					<input type="checkBox" name="remember-me">자동 고르인
+					<input type="checkBox" name="remember-me">자동 로그인
 				</div>
 				<div class="form-group">
 					<input type="submit" value="login">
