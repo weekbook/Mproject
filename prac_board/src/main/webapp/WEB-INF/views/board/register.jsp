@@ -25,7 +25,8 @@
                   <textarea class="form-control" row="3" name='content'></textarea>
                </div>
                <div class="form-group">
-                  <label>작성자</label> <input class="form-control" name="writer">
+                  <label>작성자</label> <input class="form-control" name="writer"
+                  value='<sec:authentication property="principal.username"/>' readonly="readonly">
                </div>
                <button type="submit" class="btn btn-default">전송</button>
                <button type="reset" class="btn btn-default">취소</button>
@@ -114,6 +115,13 @@
                      }
                      return true;
                   }
+                  
+                  
+                  var csrfHeaderName = "${_csrf.headerName}";
+                  var csrfTokenValue = "${_csrf.token}";
+                  /* ajax 처리시 csrf 값을 함께 전송하기 위한 준비.
+                  	스프링 시큐리티는 데이터 post 전송시 csrf 값을 꼭 확인 하므로 */
+                  
 
                   $("input[type='file']")
                         .change(
@@ -142,6 +150,11 @@
                                     data : formData, // 실제 2진 데이터 전송이 아니고, 파일관련 정보만 전송.
                                     type : 'post',// 첨부파일 처리는 get 방식은 불가.
                                     dataType : 'json',
+                                    beforeSend : function(xhr) {
+										xhr.setRequestHeader(
+												csrfHeaderName
+												,csrfTokenValue);
+									},
                                     success : function(result) {
                                        console.log(result);
                                        showUploadResult(result);
@@ -201,6 +214,12 @@
                 		  },
                 		  dataType : 'text',
                 		  type : 'POST',
+                		  beforeSend : function(xhr) {
+								xhr.setRequestHeader(
+										csrfHeaderName
+										,csrfTokenValue);
+						  },
+						  
                 		  success : function(result){
                 			  alert(result);
                 			  targetLi.remove();

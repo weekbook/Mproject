@@ -12,9 +12,14 @@
 		<div class="panel panel -default">
 			<div class="panel-body">
 				<form role="form" id="modifyForm" action="/board/modify" method="post">
+				<input type="hidden" name="${_csrf.parameterName }"
+						value="${_csrf.token }"/>
 				<input type="hidden" name="bno" value="${board.bno }"/>
 				<input type="hidden" name="pageNum" value="${cri.pageNum }"/>
 				<input type="hidden" name="amount" value="${cri.amount }"/>
+				<input type="hidden" name="type" value="${cri.type }"/>
+				<input type="hidden" name="keyword" value="${cri.keyword }"/>
+				
 					<div class="form-group">
 						<label>제목</label> <input class="form-control" name='title'
 							value='<c:out value="${board.title }"/>'>
@@ -26,10 +31,19 @@
 					</div>
 					<div  class="form-group">
 						<label>작성자</label> <input class="form-control" name="writer"
-							value='<c:out value="${board.writer }"/>'>
+							value='<c:out value="${board.writer }"/>' readonly="readonly">
 					</div>
-					<button type="submit" data-oper='modify' class="btn btn-success">수정</button>
-					<button type="submit" data-oper='remove' class="btn btn-danger">삭제</button>
+					
+					<sec:authentication property="principal" var="pinfo"/>
+					<sec:authorize access="isAuthenticated()">
+						<!-- 인증된 사용자만 허가 -->
+						<c:if test="${pinfo.username eq board.writer }">
+							<!-- 인증되었으면서 작성자가 본인 일때 수정 버튼 표시  -->
+							<button type="submit" data-oper='modify' class="btn btn-success">수정</button>
+							<button type="submit" data-oper='remove' class="btn btn-danger">삭제</button>
+						</c:if>
+					</sec:authorize>
+					
 					<button type="submit" data-oper='list' id="list_btn" class="btn btn-info">목록</button>
 				</form>
 				<%-- <form id="infoForm" action="/board/modify" method="get">
@@ -164,6 +178,9 @@
 			iform.submit();
 		}); */
 		
+		var csrfHeaderName = "${_csrf.headerName}";
+		var csrfTokenValue = "${_csrf.token}";
+		
 		// 첨부파일 x버튼을 눌렀을때 처리 스크립트
 		$(".uploadResult").on("click","b",function(e){
 			console.log("delete file");
@@ -181,6 +198,11 @@
 					},
 					dataType : 'text',
 					type : 'POST',
+					beforeSend : function(xhr) {
+						xhr.setRequestHeader(
+								csrfHeaderName
+								,csrfTokenValue);
+				  },
 					success : function(result){
 						alert(result);
 						targetLi.remove();
@@ -237,6 +259,11 @@
 	             data : formData, // 실제 2진 데이터 전송이 아니고, 파일관련 정보만 전송.
 	             type : 'post',// 첨부파일 처리는 get 방식은 불가.
 	             dataType : 'json',
+	             beforeSend : function(xhr) {
+						xhr.setRequestHeader(
+								csrfHeaderName
+								,csrfTokenValue);
+				  },
 	             success : function(result) {
 	                console.log(result);
 	                showUploadResult(result);

@@ -30,7 +30,20 @@
                <label>작성자</label> <input class="form-control" name="writer"
                   value='<c:out value="${board.writer }"/>' readonly="readonly">
             </div>
+            
+            
+            <sec:authentication property="principal" var="pinfo"/>
+            <!-- 프린시펄 정보를 pinfo라는 이름으로 jsp에서 이용. -->            
+            <sec:authorize access="isAuthenticated()">
+            <!-- 인증된 사용자만 허가 -->
+            <c:if test="${pinfo.username eq board.writer }">
+            <!-- 인증되었으면서 작성자가 본인 일때 수정 버튼 표시 -->
             <button data-oper="modify" id="boardModBtn" class="btn btn-warning">수정</button>
+            </c:if>
+            </sec:authorize>
+            
+            
+            
             <button data-oper="list" id="boardListBtn" class="btn btn-info">목록</button>
 
             <!-- 글읽기 창에서 페이지 정보 처리 시작 -->
@@ -75,8 +88,11 @@
       <div class="panel panel-default">
          <div class="panel-heading">
             <i class="fa fa-comments fa-fw"></i>덧글
+            <sec:authorize access="isAuthenticated()">
             <button id="addReplyBtn" class="btn btn-primary btn-xs float-right">
-               새 덧글</button>
+              	 새 덧글</button>
+            </sec:authorize>
+            
          </div>
          <br />
          <div class="panel-body">
@@ -105,7 +121,7 @@
             </div>
             <div class="form-group">
                <label>작성자</label> <input class="form-control" name="replyer"
-                  value="replyer">
+                  value="replyer" readonly="readonly">
             </div>
             <div class="form-group">
                <label>덧글 작성일</label> <input class="form-control" name="replyDate"
@@ -129,6 +145,12 @@
 <script>
    $(document).ready(function() {
       var formObj = $("form");/* 문서중 form 요소를 찾아서 변수에 할당. */
+      var csrfHeaderName = "${_csrf.headerName}";
+      var csrfTokenValue = "${_csrf.token}";
+      
+      $(document).ajaxSend(function(e,xhr,options){
+    	  xhr.setRequestHeader(csrfHeaderName,csrfTokenValue);
+      }); // csrf 값을 미리 설정해 두고, ajax 처리시마다 이용.
 
       $("#boardListBtn").on("click", function(e) {
          e.preventDefault();
@@ -171,6 +193,10 @@
 
       console.log(replyService);
       var bnoValue = '<c:out value="${board.bno}"/>';
+      var replyer=null;
+      <sec:authorize access="isAuthenticated()">
+      	replyer='${pinfo.username}';
+      </sec:authorize>
 
       /* replyService.add({
          reply : "js test",
@@ -218,7 +244,7 @@
          // 덧글 등록 버튼을 눌렀다면,
          var reply = {
             reply : modalInputReply.val(),
-            replyer : modalInputReplyer.val(),
+            replyer : replyer,
             bno : bnoValue
          }; // ajax로 전달할 reply 객체 선언 및 할당.
          replyService.add(reply, function(result) {
@@ -291,12 +317,11 @@
                         }
                         replyUL.html(str);
                         //replyUL.html("<h5>하하 월요일</h5>");
-//replyUL.html("<input type='text' value='" + val + "' />");   
-showReplyPage(replyTotalCnt);// 덧글 목록 표시후 쪽번호 표시.
-
-                     });//end
-      }//end_showList
-      showList(-1);
+						//replyUL.html("<input type='text' value='" + val + "' />");   
+						showReplyPage(replyTotalCnt);// 덧글 목록 표시후 쪽번호 표시.
+	              });//end
+	      }//end_showList
+	      showList(-1);
       
       // 기존 게시판의 쪽번호는 디비에서 읽어서 자바로 설정값을 만들고, 표시 했다면,
       // 덧글의 쪽번호는 디비에서 읽어서 스크립트로 표시한다는 차이.
@@ -376,10 +401,24 @@ showReplyPage(replyTotalCnt);// 덧글 목록 표시후 쪽번호 표시.
       
       // 덧글 수정 처리 시작.
       modalModBtn.on("click", function(e) {
+    	 var originalReplyer = modalInputReplyer.val();
          var reply = {
             rno : modal.data("rno"),
-            reply : modalInputReply.val()
+            reply : modalInputReply.val(),
+            replyer : originalReplyer
          };
+         
+         if(!replyer){
+        	 alert("로그인후 수정 가능");
+        	 modal.modal("hide");
+        	 return;
+         }
+         if(replyer != originalReplyer){
+        	 alert("자신이 작성한 댓글만 수정 가능");
+        	 modal.modal("hide");
+        	 return;
+         }
+         
          replyService.update(reply, function(result) {
             alert(result);
             modal.modal("hide");
@@ -390,7 +429,20 @@ showReplyPage(replyTotalCnt);// 덧글 목록 표시후 쪽번호 표시.
       // 덧글 삭제 처리.
       modalRemoveBtn.on("click", function(e) {
          var rno = modal.data("rno");
-         replyService.remove(rno, function(result) {
+         var originalReplyer = modalInputReplyer.val();
+         
+         if(!replyer){
+        	 alert("로그인후 삭제 가능");
+        	 modal.modal("hide");
+        	 return;
+         }
+         if(replyer != originalReplyer){
+        	 alert("자신이 작성한 댓글만 삭제 가능");
+        	 modal.modal("hide");
+        	 return;
+         }
+         
+         replyService.remove(rno, originalReplyer,function(result) {
             alert(result);// 안내창 표시
             modal.modal("hide");// 모달 숨기기
             showList(-1);// 덧글 목록 새로고침.

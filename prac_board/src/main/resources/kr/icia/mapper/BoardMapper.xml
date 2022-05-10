@@ -8,8 +8,6 @@
 	결과를 리턴 받아서, 테스트 창에 출력. kr.icia.mapper.BoardMapper : 생성될 인터페이스명, kr.icia.domain.BoardVO 
 	: 검색결과를 담을 value object. boardVO 객체 1개당 게시물 1개 저장. -->
 
-
-
 <mapper namespace="kr.icia.mapper.BoardMapper">
 	<select id="getList" resultType="kr.icia.domain.BoardVO">
 		<![CDATA[

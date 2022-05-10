@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,14 +54,14 @@ public class BoardController {
 		// 임의로 총게시물 190로 설정.
 	}
 	
-	
+	@PreAuthorize("isAuthenticated()") // 로그인한 사용자만 접근
 	@GetMapping("/register")
 	public void register() {
 		// 이동할 주소를 리턴하지 않는다면, 요청한 이름으로의 jsp파일을 찾음.
 		
 	}
 	
-	
+	@PreAuthorize("isAuthenticated()") // 로그인한 사용자만 접근
 	@PostMapping("/register")
 	public String register(BoardVO board, RedirectAttributes rttr) {
 		// @Controller 어노테이션이 붙고,
@@ -97,6 +98,7 @@ public class BoardController {
 	
 	
 	// post요청으로 /modify가 온다면, 아래 메소드 수행
+	@PreAuthorize("principal.username== #board.writer")
 	@PostMapping("/modify")
 	public String modify(BoardVO board, RedirectAttributes rttr, Criteria cri) {
 		log.info("modify: " + board);
@@ -113,9 +115,10 @@ public class BoardController {
 		return "redirect:/board/list";
 	}
 	
+	@PreAuthorize("principal.username== #writer")
 	@PostMapping("/remove")
 	public String remove(@RequestParam("bno") Long bno, RedirectAttributes rttr, 
-			Criteria cri) {
+			Criteria cri, String writer) {
 		
 		log.info("remove..." + bno);
 		List<BoardAttachVO> attachList = service.getAttachList(bno);
